@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Oswald:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-board: #14181D;
+  --color-panel: #1B2028;
+  --color-split: #2A2F38;
+  --color-inputbg: #20252D;
+  --color-flap: #F4EFE4;
+  --color-boarding: #5B9BD1;
+  --color-departed: #D79A3D;
+  --color-landed: #6FAE5B;
+  --color-cancelled: #D9564A;
+
+  --font-display: Oswald, sans-serif;
+  --font-sans: Inter, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+body {
+  background-color: #14181D;
+}
