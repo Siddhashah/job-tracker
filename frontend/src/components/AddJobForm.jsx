@@ -15,7 +15,7 @@ export default function AddJobForm({ onJobAdded }) {
       onJobAdded(newJob);
       setForm({ company: '', jobTitle: '', jobUrl: '', location: '' });
     } catch (err) {
-      console.error('Failed to add flight:', err);
+      console.error('Failed to add job:', err);
     } finally {
       setSubmitting(false);
     }
@@ -27,7 +27,7 @@ export default function AddJobForm({ onJobAdded }) {
       value={form[name]}
       onChange={handleChange}
       placeholder={placeholder}
-      className="bg-inputbg border border-split text-flap placeholder-flap/30 font-mono text-sm px-3 py-2 flex-1 min-w-[140px] focus:outline-none focus:border-flap"
+      className="bg-field border border-line text-ink placeholder-ink/30 font-mono text-sm px-3 py-2 flex-1 min-w-[140px] focus:outline-none focus:border-ink"
     />
   );
 
@@ -40,9 +40,9 @@ export default function AddJobForm({ onJobAdded }) {
       <button
         type="submit"
         disabled={submitting}
-        className="font-display uppercase text-sm tracking-wide bg-boarding text-board px-5 py-2 hover:opacity-90 disabled:opacity-50"
+        className="font-display uppercase text-sm tracking-wide bg-applied text-canvas px-5 py-2 hover:opacity-90 disabled:opacity-50"
       >
-        {submitting ? 'Adding…' : 'Add flight'}
+        {submitting ? 'Adding…' : 'Add job'}
       </button>
     </form>
   );

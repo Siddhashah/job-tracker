@@ -2,7 +2,7 @@ const Job = require('../models/Job');
 
 exports.getJobs = async (req, res) => {
   try {
-    const filter = req.query.status ? { status: req.query.status } : {};
+    const filter = { user: req.user.id, ...(req.query.status ? { status: req.query.status } : {}) };
     const jobs = await Job.find(filter).sort({ createdAt: -1 });
     res.json(jobs);
   } catch (err) {
@@ -12,7 +12,7 @@ exports.getJobs = async (req, res) => {
 
 exports.getJob = async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findOne({ _id: req.params.id, user: req.user.id });
     if (!job) return res.status(404).json({ error: 'Job not found' });
     res.json(job);
   } catch (err) {
@@ -22,7 +22,7 @@ exports.getJob = async (req, res) => {
 
 exports.createJob = async (req, res) => {
   try {
-    const job = new Job(req.body);
+    const job = new Job({ ...req.body, user: req.user.id });
     await job.save();
     res.status(201).json(job);
   } catch (err) {
@@ -35,10 +35,11 @@ exports.updateJob = async (req, res) => {
     const updates = { ...req.body };
     if (updates.status) updates.statusUpdatedAt = new Date();
 
-    const job = await Job.findByIdAndUpdate(req.params.id, updates, {
-      returnDocument: 'after',
-      runValidators: true,
-    });
+    const job = await Job.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },
+      updates,
+      { returnDocument: 'after', runValidators: true }
+    );
     if (!job) return res.status(404).json({ error: 'Job not found' });
     res.json(job);
   } catch (err) {
@@ -48,7 +49,7 @@ exports.updateJob = async (req, res) => {
 
 exports.deleteJob = async (req, res) => {
   try {
-    const job = await Job.findByIdAndDelete(req.params.id);
+    const job = await Job.findOneAndDelete({ _id: req.params.id, user: req.user.id });
     if (!job) return res.status(404).json({ error: 'Job not found' });
     res.json({ message: 'Job deleted' });
   } catch (err) {

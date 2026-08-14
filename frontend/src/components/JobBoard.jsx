@@ -2,21 +2,23 @@ import { DndContext, PointerSensor, useDroppable, useSensor, useSensors } from '
 import JobCard from './JobCard';
 
 const STATUSES = [
-  { value: 'Applied', label: 'Boarding' },
-  { value: 'Interview', label: 'Departed' },
-  { value: 'Offer', label: 'Landed' },
-  { value: 'Rejected', label: 'Cancelled' },
+  { value: 'Applied', label: 'Applied' },
+  { value: 'Interview', label: 'Interview' },
+  { value: 'Offer', label: 'Offer' },
+  { value: 'Ghosted', label: 'Ghosted' },
+  { value: 'Withdrawn', label: 'Withdrawn' },
+  { value: 'Rejected', label: 'Rejected' },
 ];
 
 function Column({ id, label, jobs, onDelete }) {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className={`border-t-2 ${isOver ? 'border-flap' : 'border-split'} pt-3`}>
+    <div ref={setNodeRef} className={`border-t-2 ${isOver ? 'border-ink' : 'border-line'} pt-3`}>
       <div className="flex items-baseline justify-between px-1 mb-2">
-        <h2 className="font-display uppercase text-sm tracking-widest text-flap">{label}</h2>
-        <span className="font-mono text-[11px] text-flap/50">{jobs.length}</span>
+        <h2 className="font-display uppercase text-sm tracking-widest text-ink">{label}</h2>
+        <span className="font-mono text-[11px] text-ink/50">{jobs.length}</span>
       </div>
-      {jobs.length === 0 && <p className="font-mono text-[11px] text-flap/30 italic px-1">No flights.</p>}
+      {jobs.length === 0 && <p className="font-mono text-[11px] text-ink/30 italic px-1">No applications yet.</p>}
       {jobs.map((job) => (
         <JobCard key={job._id} job={job} onDelete={onDelete} />
       ))}
@@ -31,15 +33,15 @@ export default function JobBoard({ jobs, loading, onStatusChange, onDelete }) {
     const job = jobs.find((j) => j._id === active.id);
     if (job && job.status !== over.id) onStatusChange(job._id, over.id);
   };
-  if (loading) return <p className="font-mono text-sm text-flap/60">Loading board…</p>;
+  if (loading) return <p className="font-mono text-sm text-ink/60">Loading…</p>;
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {STATUSES.map(({ value, label }) => (
           <Column key={value} id={value} label={label} jobs={jobs.filter((j) => j.status === value)} onDelete={onDelete} />
         ))}
       </div>
     </DndContext>
   );
-}
+} 
