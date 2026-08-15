@@ -28,7 +28,7 @@ function Column({ id, label, jobs, onDelete, onOpenDetail }) {
   );
 }
 
-export default function JobBoard({ jobs, loading, onStatusChange, onDelete }) {
+export default function JobBoard({ jobs, loading, onStatusChange, onDelete, onUpdateJob }) {
   const [selectedJob, setSelectedJob] = useState(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const handleDragEnd = ({ active, over }) => {
@@ -52,7 +52,7 @@ export default function JobBoard({ jobs, loading, onStatusChange, onDelete }) {
           />
         ))}
       </div>
-      <JobDetailModal job={selectedJob} onClose={() => setSelectedJob(null)} />
+      <JobDetailModal job={selectedJob} onClose={() => setSelectedJob(null)} onUpdate={onUpdateJob} />
     </DndContext>
   );
 }

@@ -54,6 +54,7 @@ function App() {
 
   const handleStatusChange = async (id, status) => { await updateJob(id, { status }); loadAll(); };
   const handleDelete = async (id) => { await deleteJob(id); loadAll(); };
+  const handleUpdateJob = async (id, updates) => { await updateJob(id, updates); await loadAll(); };
 
   const exportCSV = () => {
     const headers = ['Company', 'Role', 'Location', 'Salary', 'Status', 'Applied Date'];
@@ -91,6 +92,7 @@ function App() {
                 onStatusChange={handleStatusChange}
                 onDelete={handleDelete}
                 onJobAdded={loadAll}
+                onUpdateJob={handleUpdateJob}
               />
             }
           />
