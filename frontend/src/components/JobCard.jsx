@@ -17,7 +17,7 @@ function daysSince(dateStr) {
   return Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export default function JobCard({ job, onDelete }) {
+export default function JobCard({ job, onDelete, onOpenDetail }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: job._id });
   const style = {
     transform: transform ? CSS.Translate.toString(transform) : undefined,
@@ -32,12 +32,13 @@ export default function JobCard({ job, onDelete }) {
       style={style}
       {...listeners}
       {...attributes}
-      className={`flex items-center gap-3 border-l-4 ${STRIP_COLOR[job.status]} bg-surface px-3 py-2 mb-2 cursor-grab active:cursor-grabbing touch-none ${isDragging ? 'opacity-60' : ''}`}
+      onClick={() => onOpenDetail(job)}
+      className={`flex items-center gap-3 border-l-4 ${STRIP_COLOR[job.status]} bg-surface px-3 py-2 mb-2 cursor-pointer active:cursor-grabbing touch-none ${isDragging ? 'opacity-60' : ''}`}
     >
       <div className="flex-1 min-w-0">
         <p className="font-mono uppercase text-sm text-ink truncate">{job.jobTitle}</p>
         <p className="font-sans text-xs text-ink/60 truncate">
-          {job.company}{job.location ? ` — ${job.location}` : ''}
+          {job.company}{job.location ? ` — ${job.location}` : ''}{job.salary ? ` · ${job.salary}` : ''}
         </p>
       </div>
       {stale && (
@@ -45,7 +46,7 @@ export default function JobCard({ job, onDelete }) {
       )}
       <button
         onPointerDown={(e) => e.stopPropagation()}
-        onClick={() => onDelete(job._id)}
+        onClick={(e) => { e.stopPropagation(); onDelete(job._id); }}
         className="font-mono text-[10px] text-ink/40 hover:text-rejected shrink-0"
       >
         delete

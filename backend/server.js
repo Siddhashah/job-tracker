@@ -5,11 +5,14 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const requireAuth = require('./middleware/auth');
 const jobRoutes = require('./routes/jobRoutes');
+const extractRoutes = require('./routes/extractRoutes');
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', requireAuth, jobRoutes);
+app.use('/api/extract', requireAuth, extractRoutes);
+
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 mongoose.connect(process.env.MONGODB_URI)

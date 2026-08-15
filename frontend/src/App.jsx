@@ -1,26 +1,36 @@
 import { useEffect, useState } from 'react';
-import { getJobs, updateJob, deleteJob } from './api/jobsApi';
-import AddJobForm from './components/AddJobForm';
-import JobBoard from './components/JobBoard';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { getJobs, updateJob, deleteJob, getStats } from './api/jobsApi';
 import AuthForm from './components/AuthForm';
-import UserMenu from './components/UserMenu';
+import Navbar from './components/Navbar';
+import HomePage from './pages/HomePage';
+import AnalyticsPage from './pages/AnalyticsPage';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [firstName, setFirstName] = useState(localStorage.getItem('firstName') || '');
   const [lastName, setLastName] = useState(localStorage.getItem('lastName') || '');
   const [jobs, setJobs] = useState([]);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState('');
+  const [statsLoading, setStatsLoading] = useState(true);
 
-  const loadJobs = async () => {
+  const loadAll = async () => {
     setLoading(true);
-    try { setJobs(await getJobs()); }
-    catch (err) { console.error('Failed to load jobs:', err); }
-    finally { setLoading(false); }
+    setStatsLoading(true);
+    try {
+      const [jobsData, statsData] = await Promise.all([getJobs(), getStats()]);
+      setJobs(jobsData);
+      setStats(statsData);
+    } catch (err) {
+      console.error('Failed to load data:', err);
+    } finally {
+      setLoading(false);
+      setStatsLoading(false);
+    }
   };
 
-  useEffect(() => { if (token) loadJobs(); }, [token]);
+  useEffect(() => { if (token) loadAll(); }, [token]);
 
   const handleAuth = (data) => {
     localStorage.setItem('token', data.token);
@@ -39,39 +49,55 @@ function App() {
     setFirstName('');
     setLastName('');
     setJobs([]);
+    setStats(null);
   };
 
-  const handleStatusChange = async (id, status) => { await updateJob(id, { status }); loadJobs(); };
-  const handleDelete = async (id) => { await deleteJob(id); loadJobs(); };
+  const handleStatusChange = async (id, status) => { await updateJob(id, { status }); loadAll(); };
+  const handleDelete = async (id) => { await deleteJob(id); loadAll(); };
+
+  const exportCSV = () => {
+    const headers = ['Company', 'Role', 'Location', 'Salary', 'Status', 'Applied Date'];
+    const rows = jobs.map((j) => [
+      j.company, j.jobTitle, j.location || '', j.salary || '', j.status,
+      new Date(j.appliedDate || j.createdAt).toLocaleDateString(),
+    ]);
+    const csv = [headers, ...rows]
+      .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'job-applications.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   if (!token) return <AuthForm onAuth={handleAuth} />;
 
-  const filtered = jobs.filter((j) => (j.company + ' ' + j.jobTitle).toLowerCase().includes(query.toLowerCase()));
   const active = jobs.filter((j) => j.status === 'Applied' || j.status === 'Interview').length;
 
   return (
-    <div className="min-h-screen bg-canvas">
-      <div className="border-b border-line px-6 py-5">
-        <div className="max-w-7xl mx-auto flex items-baseline justify-between flex-wrap gap-4">
-          <h1 className="font-display uppercase text-3xl tracking-widest text-ink">Job Tracker</h1>
-          <div className="flex items-center gap-4">
-            <p className="font-mono text-sm text-ink/50">{active} active</p>
-            <UserMenu firstName={firstName} lastName={lastName} onLogout={handleLogout} />
-          </div>
-        </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-canvas">
+        <Navbar active={active} onExport={exportCSV} firstName={firstName} lastName={lastName} onLogout={handleLogout} />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage
+                jobs={jobs}
+                loading={loading}
+                onStatusChange={handleStatusChange}
+                onDelete={handleDelete}
+                onJobAdded={loadAll}
+              />
+            }
+          />
+          <Route path="/analytics" element={<AnalyticsPage stats={stats} loading={statsLoading} />} />
+        </Routes>
       </div>
-
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="SEARCH BY COMPANY OR ROLE…"
-          className="w-full max-w-sm bg-field border border-line text-ink placeholder-ink/30 font-mono text-xs px-3 py-2 mb-6 focus:outline-none focus:border-ink"
-        />
-        <AddJobForm onJobAdded={loadJobs} />
-        <JobBoard jobs={filtered} loading={loading} onStatusChange={handleStatusChange} onDelete={handleDelete} />
-      </div>
-    </div>
+    </BrowserRouter>
   );
 }
 

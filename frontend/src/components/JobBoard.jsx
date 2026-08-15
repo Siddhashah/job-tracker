@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { DndContext, PointerSensor, useDroppable, useSensor, useSensors } from '@dnd-kit/core';
 import JobCard from './JobCard';
+import JobDetailModal from './JobDetailModal';
 
 const STATUSES = [
   { value: 'Applied', label: 'Applied' },
@@ -10,7 +12,7 @@ const STATUSES = [
   { value: 'Rejected', label: 'Rejected' },
 ];
 
-function Column({ id, label, jobs, onDelete }) {
+function Column({ id, label, jobs, onDelete, onOpenDetail }) {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
     <div ref={setNodeRef} className={`border-t-2 ${isOver ? 'border-ink' : 'border-line'} pt-3`}>
@@ -20,13 +22,14 @@ function Column({ id, label, jobs, onDelete }) {
       </div>
       {jobs.length === 0 && <p className="font-mono text-[11px] text-ink/30 italic px-1">No applications yet.</p>}
       {jobs.map((job) => (
-        <JobCard key={job._id} job={job} onDelete={onDelete} />
+        <JobCard key={job._id} job={job} onDelete={onDelete} onOpenDetail={onOpenDetail} />
       ))}
     </div>
   );
 }
 
 export default function JobBoard({ jobs, loading, onStatusChange, onDelete }) {
+  const [selectedJob, setSelectedJob] = useState(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const handleDragEnd = ({ active, over }) => {
     if (!over) return;
@@ -39,9 +42,17 @@ export default function JobBoard({ jobs, loading, onStatusChange, onDelete }) {
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {STATUSES.map(({ value, label }) => (
-          <Column key={value} id={value} label={label} jobs={jobs.filter((j) => j.status === value)} onDelete={onDelete} />
+          <Column
+            key={value}
+            id={value}
+            label={label}
+            jobs={jobs.filter((j) => j.status === value)}
+            onDelete={onDelete}
+            onOpenDetail={setSelectedJob}
+          />
         ))}
       </div>
+      <JobDetailModal job={selectedJob} onClose={() => setSelectedJob(null)} />
     </DndContext>
   );
-} 
+}
