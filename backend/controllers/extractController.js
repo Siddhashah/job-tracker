@@ -3,7 +3,8 @@ exports.extractPosting = async (req, res) => {
     const { text } = req.body;
     if (!text || !text.trim()) return res.status(400).json({ error: 'Text is required' });
 
-    const response = await fetch('http://localhost:8000/extract', {
+    const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+    const response = await fetch(`${mlServiceUrl}/extract`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }),

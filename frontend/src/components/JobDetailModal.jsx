@@ -10,6 +10,8 @@ export default function JobDetailModal({ job, onClose, onUpdate }) {
   useEffect(() => {
     if (job) {
       setForm({
+        company: job.company || '',
+        jobTitle: job.jobTitle || '',
         status: job.status,
         location: job.location || '',
         salary: job.salary || '',
@@ -27,6 +29,8 @@ export default function JobDetailModal({ job, onClose, onUpdate }) {
     setSaving(true);
     try {
       await onUpdate(job._id, {
+        company: form.company,
+        jobTitle: form.jobTitle,
         status: form.status,
         location: form.location,
         salary: form.salary,
@@ -71,6 +75,8 @@ export default function JobDetailModal({ job, onClose, onUpdate }) {
 
         {editing ? (
           <>
+            {editRow('Company', 'company', 'Company')}
+            {editRow('Role', 'jobTitle', 'Job title')}
             <div className="flex justify-between items-center gap-4 py-2 border-b border-line">
               <span className="font-mono text-[10px] uppercase tracking-wider text-ink/50 shrink-0">Status</span>
               <select
@@ -88,6 +94,8 @@ export default function JobDetailModal({ job, onClose, onUpdate }) {
           </>
         ) : (
           <>
+            {row('Company', job.company)}
+            {row('Role', job.jobTitle)}
             {row('Status', job.status)}
             {row('Location', job.location)}
             {row('Salary', job.salary)}

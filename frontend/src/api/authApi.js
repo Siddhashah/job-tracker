@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({ baseURL: 'http://localhost:5000/api' });
+import api from './client';
 
 export const registerUser = (firstName, lastName, email, password) =>
   api.post('/auth/register', { firstName, lastName, email, password }).then((res) => res.data);

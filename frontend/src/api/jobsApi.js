@@ -1,12 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({ baseURL: 'http://localhost:5000/api' });
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+import api from './client';
 
 export const getJobs = () => api.get('/jobs').then((res) => res.data);
 export const createJob = (job) => api.post('/jobs', job).then((res) => res.data);
