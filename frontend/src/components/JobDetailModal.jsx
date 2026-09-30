@@ -64,7 +64,13 @@ export default function JobDetailModal({ job, onClose, onUpdate }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4" onClick={onClose}>
-      <div className="bg-surface border border-line w-full max-w-md px-6 py-5" onClick={(e) => e.stopPropagation()}>
+      {/* max-h-[90vh] + overflow-y-auto: without this, a job with a long
+          skills list on a short/landscape phone screen could push the
+          Save button off-screen with no way to reach it. */}
+      <div
+        className="bg-surface border border-line w-full max-w-md max-h-[90vh] overflow-y-auto px-6 py-5"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-start mb-4">
           <div>
             <p className="font-display uppercase text-lg tracking-wide text-ink">{job.jobTitle}</p>

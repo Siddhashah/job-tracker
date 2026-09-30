@@ -9,7 +9,7 @@ export default function HomePage({ jobs, loading, onStatusChange, onDelete, onJo
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
