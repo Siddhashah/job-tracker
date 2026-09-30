@@ -40,20 +40,18 @@ export default function JobBoard({ jobs, loading, onStatusChange, onDelete, onUp
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      {/* Below sm: horizontally-scrolling, snap-to columns — six statuses
-          squeezed into a grid is unreadable on a phone. sm+ keeps the
-          original grid layout unchanged. */}
-      <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:overflow-visible sm:mx-0 sm:px-0 sm:pb-0">
+      {/* Below sm: one full-width status section per row, stacked vertically —
+          no horizontal swiping needed. sm+ switches to the side-by-side grid. */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-4">
         {STATUSES.map(({ value, label }) => (
-          <div key={value} className="w-[82vw] max-w-[300px] shrink-0 snap-start sm:w-auto sm:max-w-none sm:shrink">
-            <Column
-              id={value}
-              label={label}
-              jobs={jobs.filter((j) => j.status === value)}
-              onDelete={onDelete}
-              onOpenDetail={setSelectedJob}
-            />
-          </div>
+          <Column
+            key={value}
+            id={value}
+            label={label}
+            jobs={jobs.filter((j) => j.status === value)}
+            onDelete={onDelete}
+            onOpenDetail={setSelectedJob}
+          />
         ))}
       </div>
       <JobDetailModal job={selectedJob} onClose={() => setSelectedJob(null)} onUpdate={onUpdateJob} />
